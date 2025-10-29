@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
 import { abi, address as contractAddress } from "../../config/config";
