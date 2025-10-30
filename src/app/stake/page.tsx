@@ -222,7 +222,7 @@ function page() {
         <div className="mt-6 pt-4 border-t border-gray-700">
           <p className="text-sm text-gray-400 mb-1">Amount to Bet On:</p>
           <div className="text-center p-2 bg-gray-900 rounded-md font-mono text-xl">
-            <span className="text-yellow-400">{currentBet}</span>
+            <span className="text-yellow-400">{Number(currentBet)/10**8}</span>
           </div>
         </div>
       </div>
