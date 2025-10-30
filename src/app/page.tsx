@@ -18,7 +18,7 @@ export default function Home() {
       }}
     >
       
-      <div className="absolute inset-0 bg-black opacity-70"></div> 
+      <div className="absolute inset-0 bg-black opacity-40"></div> 
 
      
       <div className="relative z-10 flex flex-col items-center justify-center max-w-2xl w-full space-y-12">

@@ -18,7 +18,7 @@ contract Stake is Owner {
     
     mapping(address => PlayerDetails) StakePool;
     bool public isStakeActive = false;
-    uint constant MINIMUM = 5 * 1e18; // 5 dollar
+    uint MINIMUM ; // 5 dollar
     uint BET; // 1 eth in dollar
 
     event WinningsDistributed(
@@ -34,18 +34,23 @@ contract Stake is Owner {
 
     constructor() {
         dataFeed = AggregatorV3Interface(
-            0x1b44F3514812d835EB1BDB0acB33d3fA3351Ee43
+            0x694AA1769357215DE4FAC081bf1f309aDC325306
         );
+        MINIMUM = 5 * (10 ** dataFeed.decimals());
     }
 
     function getCurrentAmountToBetOn() public view returns (uint256) {
         return BET;
     }
 
-    function getEthValue() private view returns (uint256) {
+    function getEthValue() public view returns (uint256) {
         (, int256 price, , , ) = dataFeed.latestRoundData();
         require(price >= 0, "Negative price");
-        return (uint256(price)) * (10 ** (18 - dataFeed.decimals()));
+        return (uint256(price));
+    }
+
+    function IsBetPlaced(address _user) public view returns (bool){
+        return players.contains(_user);
     }
 
     function placeBet(bool value) public payable {
@@ -59,7 +64,10 @@ contract Stake is Owner {
             (msg.value * currentEthPrice) / 1e18 >= MINIMUM,
             "Bet value is less than 5 USD equivalent"
         );
-        StakePool[msg.sender].value = value;
+        if(!IsBetPlaced(msg.sender)){
+            StakePool[msg.sender].value = value;
+        }
+        
         StakePool[msg.sender].amount += msg.value;
         players.add(msg.sender);
     }
@@ -129,7 +137,7 @@ contract Stake is Owner {
 
             if (StakePool[player].value == winningValue) {
                 //formula
-                uint256 share = (stakedAmount * totalLoserAmount * 1e18 / winningPoolAmount) / 1e18;
+                uint256 share = (stakedAmount * totalLoserAmount) / winningPoolAmount;
                 uint256 totalPayout = stakedAmount + share;
                 
                 
