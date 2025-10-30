@@ -100,13 +100,12 @@ function page() {
       <header className="text-center mb-12">
         <h1 className="text-5xl font-bold mb-2">
           
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 text-6xl">
-            Crypto
-          </span>{" "}
-          Bet
+          <span className="text-blue-400 text-6xl">
+            Stake Here  
+          </span>
         </h1>
         <p className="text-lg text-gray-400 max-w-md mx-auto">
-          Predict market movement and earn high yields on your predictions.
+          Predict and earn from the market
         </p>
       </header>
 
