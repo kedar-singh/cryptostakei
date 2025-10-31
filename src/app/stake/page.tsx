@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { EffectCallback, useCallback, useEffect, useState } from "react";
 import { sepolia } from "viem/chains";
 import { useAccount, useReadContract, useWriteContract } from "wagmi";
 import { abi, address as contractAddress } from "../../config/config";
@@ -8,6 +8,7 @@ import { formatEther, parseEther } from "viem";
 
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { promises } from "dns";
 
 function page() {
   const { address, isConnected } = useAccount();
@@ -15,9 +16,13 @@ function page() {
   if (!isConnected) redirect("/pleaseconnect");
 
   const [error, setError] = useState<string>("");
+  const [ethValueToShow, setEthValueToShow] = useState(3570);
 
   const [investetAmt, setInvestedAmt] = useState(150);
   const [Bet, setBet] = useState(true);
+  const [alreadyPredicted,setAlreadyPredicted] = useState(false);
+
+
 
   const { writeContract, isSuccess } = useWriteContract();
 
@@ -31,6 +36,11 @@ function page() {
     address: contractAddress,
     functionName: "getEthValue",
   }) as { data: bigint; refetch: any };
+  const { data: IsBetPlaced, refetch:betPlaced } = useReadContract({
+    abi,
+    address: contractAddress,
+    functionName: "IsBetPlaced",
+  }) as { data: boolean , refetch: any};
 
   const { data: currentBet } = useReadContract({
     abi,
@@ -71,6 +81,21 @@ function page() {
     const value = e.target.value.replace(/[^0-9.]/g, "");
     setInvestedAmt(value);
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await refetch(); 
+      const ethRate = Number(result.data) / 10 ** 8; 
+      setEthValueToShow(ethRate);
+    };
+
+    fetchData();
+
+    const interval = setInterval(fetchData, 3000);
+
+    return () => clearInterval(interval);
+  }, [refetch]);
+  
 
   
 
@@ -114,12 +139,12 @@ function page() {
       
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-400 mb-1">
-            Current Asset Value
+            Current Ethereum Value in Dollar
           </label>
           <div className="flex items-center justify-center p-3 bg-gray-700 rounded-lg text-2xl font-semibold border-2 border-cyan-500/50">
            
             <span className="text-blue-500">
-              {Number(ethValue) / 10 ** 8} $
+              {ethValueToShow.toFixed(4)} $
             </span>
           </div>
         </div>
@@ -221,7 +246,7 @@ function page() {
         <div className="mt-6 pt-4 border-t border-gray-700">
           <p className="text-sm text-gray-400 mb-1">Amount to Bet On:</p>
           <div className="text-center p-2 bg-gray-900 rounded-md font-mono text-xl">
-            <span className="text-yellow-400">{Number(currentBet)/10**8} $</span>
+            <span className="text-yellow-400">{(Number(currentBet)/10**8).toFixed(4)} $</span>
           </div>
         </div>
       </div>
